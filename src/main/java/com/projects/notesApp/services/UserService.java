@@ -4,6 +4,7 @@ import com.projects.notesApp.models.DTOs.UserVerifyDTO;
 import com.projects.notesApp.models.User;
 import com.projects.notesApp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +13,9 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -23,11 +26,16 @@ public class UserService {
     }
 
     public boolean verifyUser(UserVerifyDTO userVerifyDTO) {
-        List<User> users = userRepository.getUser(userVerifyDTO.getUserName(), userVerifyDTO.getPassword());
-        return !users.isEmpty();
+        List<User> users = userRepository.getUser(userVerifyDTO.getUserName());
+        if(users.isEmpty()) return false;
+        String storedHashPassword = users.get(0).getPassword();
+        String userInputPassword = userVerifyDTO.getPassword();
+        return passwordEncoder.matches(userInputPassword, storedHashPassword);
     }
 
     public User addUser(User user) {
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
 
