@@ -1,5 +1,8 @@
 package com.projects.notesApp.controllers;
 
+import com.projects.notesApp.exceptions.UserAlreadyExistsException;
+import com.projects.notesApp.exceptions.UserDoesNotExistsException;
+import com.projects.notesApp.models.DTOs.UserDTO;
 import com.projects.notesApp.models.DTOs.UserVerifyDTO;
 import com.projects.notesApp.models.User;
 import com.projects.notesApp.services.UserService;
@@ -8,6 +11,7 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,17 +28,22 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        return new ResponseEntity<>(userService.addUser(user), HttpStatus.CREATED);
+    public ResponseEntity<?> addUser(@RequestBody UserDTO user) {
+        try {
+            return new ResponseEntity<>(userService.addUser(user), HttpStatus.CREATED);
+        }catch (UserAlreadyExistsException u) {
+            return new ResponseEntity<>(u.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
-        User updatedUser = userService.updateUser(user);
-        if(updatedUser == null) {
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO user) {
+        try {
+            User updatedUser = userService.updateUser(user);
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        }catch (UserDoesNotExistsException u) {
             return new ResponseEntity<>("user no exists", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -48,9 +57,13 @@ public class UserController {
 
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody UserVerifyDTO userVerifyDTO) {
-        boolean verified = userService.verifyUser(userVerifyDTO);
-        if (!verified)
-            return new ResponseEntity<>("Invalid username or password", HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>("User verified", HttpStatus.OK);
+        try {
+            boolean verified = userService.verifyUser(userVerifyDTO);
+            if (!verified)
+                return new ResponseEntity<>("Invalid username or password", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("User verified", HttpStatus.OK);
+        } catch (UserDoesNotExistsException u) {
+            return new ResponseEntity<>(u.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

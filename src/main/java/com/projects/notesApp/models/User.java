@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
-    public User(String ussername, String email, String passwordHash) {
+    public User(String username, String email, String passwordHash) {
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
