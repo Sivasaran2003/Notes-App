@@ -1,7 +1,5 @@
 package com.projects.notesApp.models;
 
-import com.projects.notesApp.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

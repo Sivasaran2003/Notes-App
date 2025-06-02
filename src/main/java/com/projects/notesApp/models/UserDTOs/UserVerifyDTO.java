@@ -1,4 +1,4 @@
-package com.projects.notesApp.models.DTOs;
+package com.projects.notesApp.models.UserDTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

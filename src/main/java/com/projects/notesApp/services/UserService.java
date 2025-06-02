@@ -3,10 +3,8 @@ package com.projects.notesApp.services;
 import com.projects.notesApp.exceptions.UserAlreadyExistsException;
 import com.projects.notesApp.exceptions.UserDoesNotExistsException;
 import com.projects.notesApp.models.AppUsers;
-import com.projects.notesApp.models.DTOs.UserDTO;
-import com.projects.notesApp.models.DTOs.UserDTO;
-import com.projects.notesApp.models.DTOs.UserMapper;
-import com.projects.notesApp.models.DTOs.UserVerifyDTO;
+import com.projects.notesApp.models.UserDTOs.UserDTO;
+import com.projects.notesApp.models.UserDTOs.UserMapper;
 import com.projects.notesApp.models.User;
 import com.projects.notesApp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +26,20 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserMapper mapper;
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream().
+                map(u -> mapper.userToUserDTO(u))
+                .toList();
     }
 
     public User findById(int id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    public boolean verifyUser(UserVerifyDTO userVerifyDTO) throws UserDoesNotExistsException{
-        User user = userRepository.findByMail(userVerifyDTO.getEmail());
-        if(!userRepository.existsByMail(user.getEmail())) {
-            throw new UserDoesNotExistsException(user.getEmail());
-        }
-        String storedHashPassword = user.getPasswordHash();
-        String userInputPassword = userVerifyDTO.getPassword();
-        return passwordEncoder.matches(userInputPassword, storedHashPassword);
-    }
-
     public User addUser(UserDTO newUserDTO) throws UserAlreadyExistsException{
         User user = mapper.UserDTOUser(newUserDTO);
-        if(userRepository.existsByMail(user.getEmail())) {
+        if(userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getEmail());
         }
         String hashedPassword = passwordEncoder.encode(newUserDTO.getPassword());
@@ -65,7 +56,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUser(UserDTO user) throws UserDoesNotExistsException{
-        if(!userRepository.existsByMail(user.getEmail())) {
+        if(!userRepository.existsByEmail(user.getEmail())) {
             throw new UserDoesNotExistsException(user.getEmail());
         }
         return userRepository.save(mapper.UserDTOUser(user));
@@ -73,6 +64,8 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return new AppUsers(userRepository.findByMail(email));
+        System.out.println("Authenticating user: " + email);
+        return new AppUsers(userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found")));
     }
 }

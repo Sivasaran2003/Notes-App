@@ -14,9 +14,9 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
-    @Column(name = "user_id", columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment primary key
+    @Column(name = "user_id", updatable = false, nullable = false)
+    private Long userId;
 
     @Column(nullable = false)
     private String username;

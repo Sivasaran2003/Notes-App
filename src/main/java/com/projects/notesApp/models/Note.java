@@ -18,6 +18,11 @@ public class Note{
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "UserId")
-    private User userId;
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Note(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
 }
