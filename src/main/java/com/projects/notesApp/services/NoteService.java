@@ -45,4 +45,15 @@ public class NoteService {
         note.setDescription(noteDTO.getDescription());
         return noteRepository.save(note);
     }
+
+    public void deleteNoteById(int id) {
+        if(!userRepository.existsById(id)) throw new IllegalArgumentException("invalid note id");
+        userRepository.deleteById(id);
+    }
+
+    public Note updateNote(Note note) {
+        return noteRepository.save(note);
+    }
+
+
 }

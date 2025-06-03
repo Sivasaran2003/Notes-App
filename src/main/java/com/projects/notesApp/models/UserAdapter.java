@@ -6,10 +6,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class AppUsers implements UserDetails {
+public class UserAdapter implements UserDetails {
     private User user;
 
-    public AppUsers(User user) {
+    public UserAdapter(User user) {
         this.user = user;
     }
 

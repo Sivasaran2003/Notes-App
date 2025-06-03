@@ -2,7 +2,7 @@ package com.projects.notesApp.services;
 
 import com.projects.notesApp.exceptions.UserAlreadyExistsException;
 import com.projects.notesApp.exceptions.UserDoesNotExistsException;
-import com.projects.notesApp.models.AppUsers;
+import com.projects.notesApp.models.UserAdapter;
 import com.projects.notesApp.models.UserDTOs.UserDTO;
 import com.projects.notesApp.models.UserDTOs.UserMapper;
 import com.projects.notesApp.models.User;
@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("Authenticating user: " + email);
-        return new AppUsers(userRepository.findByEmail(email)
+        return new UserAdapter(userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found")));
     }
 }
