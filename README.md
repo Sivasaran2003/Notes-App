@@ -1,20 +1,9 @@
-Notes App Backend
+**Notes App Backend**
 - A simple backend application for managing notes
 - Allows users to create, modify, and delete their personalized notes.
 - This application uses Spring Boot, Spring Security for session-based authentication, and a MySQL database for data persistence.
 
-Table of Contents
-System Requirements
-
-How to Execute the Code
-
-API Endpoints
-
-Authentication & User Management
-
-Notes Management
-
-System Requirements
+**System Requirements**
 To run this application, you will need:
 
 Java Development Kit (JDK): Version 17 or higher
@@ -25,13 +14,13 @@ Redis Server: For Spring Session to store session data
 
 Maven: Version 3.9.9 or higher
 
-How to Execute the Code
+**How to Execute the Code**
 Clone the Repository:
 
 git clone https://github.com/Sivasaran2003/Notes-App.git
 cd notesApp
 
-Database Setup:
+**Database Setup:**
 
 Ensure your MySQL server is running.
 
@@ -45,7 +34,7 @@ spring.datasource.password=<your-mysql-password>
 spring.jpa.hibernate.ddl-auto=update # or create, create-drop for schema management
 spring.jpa.show-sql=true
 
-Redis Setup:
+**Redis Setup:**
 
 Ensure your Redis server is running, typically on localhost:6379.
 
@@ -55,7 +44,7 @@ spring.session.store-type=redis
 spring.data.redis.host=localhost
 spring.data.redis.port=6379
 
-Build and Run the Project:
+**Build and Run the Project:**
 
 Navigate to the project root directory in your terminal.
 
@@ -69,7 +58,7 @@ mvn spring-boot:run
 
 The application will start on http://localhost:8080 by default.
 
-API Endpoints
+**API Endpoints**
 All endpoints are relative to the base URL: http://localhost:8080.
 
 Authentication & User Management
@@ -219,7 +208,7 @@ Error Response (400 Bad Request): If user does not exist.
 
 "User does not exist"
 
-Notes Management
+**Notes Management**
 These endpoints handle CRUD operations for notes. All notes endpoints require authentication.
 
 1. Get All Notes
