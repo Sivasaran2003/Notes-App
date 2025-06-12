@@ -15,14 +15,13 @@ public class UserMapper {
     public UserDTO userToUserDTO(User user) {
         return new UserDTO(
                 user.getEmail(),
-                user.getPasswordHash(),
-                user.getUsername()
+                user.getPasswordHash()
         );
     }
 
     public User UserDTOUser(UserDTO newUserDTO) {
         return new User(
-                newUserDTO.getUserName(), newUserDTO.getEmail(), newUserDTO.getPassword()
+                newUserDTO.getEmail(), newUserDTO.getPassword()
         );
     }
 }

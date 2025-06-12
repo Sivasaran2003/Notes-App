@@ -8,6 +8,9 @@ import com.projects.notesApp.models.UserDTOs.UserMapper;
 import com.projects.notesApp.models.User;
 import com.projects.notesApp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,13 +21,17 @@ import java.util.List;
 
 // need to replace booleans, null with something
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserMapper mapper;
+    @Autowired
+    private AuthenticationManager authManager;
+    @Autowired
+    private JWTService jwtService;
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll()
@@ -42,9 +49,19 @@ public class UserService implements UserDetailsService {
         if(userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getEmail());
         }
-        String hashedPassword = passwordEncoder.encode(newUserDTO.getPassword());
-        user.setPasswordHash(hashedPassword);
+        user.setPasswordHash(passwordEncoder.encode(newUserDTO.getPassword()));
         return userRepository.save(user);
+    }
+
+    public String verify(UserDTO user) {
+        System.out.println(user.getEmail() + " " + user.getPassword());
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        if(authentication.isAuthenticated()) {
+            return jwtService.generateToken(user);
+        }
+
+        return "not verified";
     }
 
     public boolean deleteUser(int id) {
@@ -60,12 +77,5 @@ public class UserService implements UserDetailsService {
             throw new UserDoesNotExistsException(user.getEmail());
         }
         return userRepository.save(mapper.UserDTOUser(user));
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("Authenticating user: " + email);
-        return new UserAdapter(userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found")));
     }
 }
