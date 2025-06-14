@@ -24,15 +24,11 @@ public class NoteService {
     UserRepository userRepository;
     @Autowired
     NoteMapper noteMapper;
-
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
+    @Autowired
+    UserService userService;
 
     public List<NoteDTO> getNotes() {
-        return noteRepository.findByUser_UserId(getCurrentUser().getUserId())
+        return noteRepository.findByUser_UserId(userService.getCurrentUser().getUserId())
                 .stream()
                 .map(note -> noteMapper.noteToNoteDTO(note))
                 .toList();
@@ -40,7 +36,7 @@ public class NoteService {
 
     public Note addNote(NoteDTO noteDTO) {
         Note note = noteMapper.NoteDTOtoNote(noteDTO);
-        note.setUser(getCurrentUser());
+        note.setUser(userService.getCurrentUser());
         note.setTitle(noteDTO.getTitle());
         note.setDescription(noteDTO.getDescription());
         return noteRepository.save(note);

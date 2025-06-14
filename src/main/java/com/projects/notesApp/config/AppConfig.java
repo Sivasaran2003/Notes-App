@@ -15,12 +15,32 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class AppConfig {
     private final UserDetailsService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JWTFilter jwtAuthFilter;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST ,"/user/login").permitAll()      // Allow login
+                        .requestMatchers(HttpMethod.POST, "/user").permitAll()            // Allow user registration
+                        .requestMatchers("/user/**").authenticated()     // Protect other user endpoints
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 
     public AppConfig(MyUserDetailsService userService) {
         this.userService = userService;
@@ -39,20 +59,5 @@ public class AppConfig {
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST ,"/user/login").permitAll()      // Allow login
-                        .requestMatchers(HttpMethod.POST, "/user").permitAll()            // Allow user registration
-                        .requestMatchers("/user/**").authenticated()     // Protect other user endpoints
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults());
-
-        return http.build();
     }
 }
