@@ -40,11 +40,8 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream().
-                map(u -> mapper.userToUserDTO(u))
-                .toList();
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public User findById(int id) {
