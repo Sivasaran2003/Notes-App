@@ -1,6 +1,6 @@
 # 📝 Notes App Backend
 
-A simple backend application for managing personalized notes. Built using Spring Boot with session-based authentication via Spring Security, and MySQL for persistence. Redis is used for storing session data.
+A simple backend application for managing personalized notes. Built using **Spring Boot**, **JWT-based authentication** via **Spring Security**, and **MySQL** for persistence.
 
 ---
 
@@ -8,7 +8,6 @@ A simple backend application for managing personalized notes. Built using Spring
 
 - **Java Development Kit (JDK):** 17 or higher  
 - **MySQL Database:** 9.3.0 or compatible  
-- **Redis Server:** Required for Spring Session  
 - **Maven:** 3.9.9 or higher  
 
 ---
@@ -36,17 +35,7 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 ```
 
-### 3. Redis Setup
-
-Make sure Redis is running (default on `localhost:6379`). The following should already be in `application.properties`:
-
-```properties
-spring.session.store-type=redis
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
-```
-
-### 4. Build and Run
+### 3. Build and Run
 
 ```bash
 mvn clean install
@@ -61,9 +50,11 @@ App will be available at: [http://localhost:8080](http://localhost:8080)
 
 All endpoints are relative to: `http://localhost:8080`
 
-### 🔐 Authentication & User Management
+---
 
-#### 1. Register a New User
+## 🔐 Authentication & User Management (JWT-based)
+
+### 1. Register a New User
 - **URL:** `/user`
 - **Method:** `POST`
 - **Request Body:**
@@ -86,7 +77,7 @@ All endpoints are relative to: `http://localhost:8080`
 
 ---
 
-#### 2. User Login
+### 2. User Login
 - **URL:** `/user/login`
 - **Method:** `POST`
 - **Request Body:**
@@ -96,25 +87,23 @@ All endpoints are relative to: `http://localhost:8080`
   "password": "securepassword123"
 }
 ```
-- **Success (200):**  
-  `"Login successful! Session ID: <your-session-id>"`
+- **Success (200):**
+```json
+{
+  "token": "<jwt-token>"
+}
+```
 - **Error (401):** `"Login failed: Bad credentials"`
 
----
-
-#### 3. User Logout
-- **URL:** `/user/logout`
-- **Method:** `POST`
-- **Headers:** Requires `JSESSIONID` cookie or `x-auth-token`
-- **Success (200):** `"Logout successful!"`
-- **Error (400):** `"No active session to logout."`
+> 💡 Use the returned JWT token in the `Authorization` header as:  
+`Authorization: Bearer <jwt-token>`
 
 ---
 
-#### 4. Get All Users _(Protected)_
+### 3. Get All Users _(Protected)_
 - **URL:** `/user`
 - **Method:** `GET`
-- **Headers:** Requires authentication
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Success (302):**
 ```json
 [
@@ -134,10 +123,10 @@ All endpoints are relative to: `http://localhost:8080`
 
 ---
 
-#### 5. Update User _(Protected)_
+### 4. Update User _(Protected)_
 - **URL:** `/user`
 - **Method:** `PUT`
-- **Headers:** Requires authentication
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Request Body:**
 ```json
 {
@@ -159,11 +148,11 @@ All endpoints are relative to: `http://localhost:8080`
 
 ---
 
-#### 6. Delete User _(Protected)_
+### 5. Delete User _(Protected)_
 - **URL:** `/user/{id}`
 - **Method:** `DELETE`
-- **Path Variable:** `id` - user ID
-- **Headers:** Requires authentication
+- **Path Variable:** `id` - user ID  
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Success (200):** `"User deleted successfully"`
 - **Error (400):** `"User does not exist"`
 
@@ -171,13 +160,14 @@ All endpoints are relative to: `http://localhost:8080`
 
 ## 🗒️ Notes Management (Protected)
 
-All note APIs require valid session authentication.
+All note APIs require JWT token in the `Authorization` header.
 
 ---
 
 ### 1. Get All Notes
 - **URL:** `/notes`
 - **Method:** `GET`
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Success (200):**
 ```json
 [
@@ -202,6 +192,7 @@ All note APIs require valid session authentication.
 ### 2. Add a New Note
 - **URL:** `/notes`
 - **Method:** `POST`
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Request Body:**
 ```json
 {
@@ -226,6 +217,7 @@ All note APIs require valid session authentication.
 ### 3. Delete a Note
 - **URL:** `/notes/{id}`
 - **Method:** `DELETE`
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Path Variable:** `id` - note ID
 - **Success (200):** `"note deleted"`
 - **Error (400):** `"Note with id <id> not found"`
@@ -236,6 +228,7 @@ All note APIs require valid session authentication.
 ### 4. Update a Note
 - **URL:** `/notes/{id}`
 - **Method:** `PUT`
+- **Headers:** `Authorization: Bearer <jwt-token>`
 - **Path Variable:** `id` - note ID
 - **Request Body:**
 ```json
