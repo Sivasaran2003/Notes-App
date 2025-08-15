@@ -255,4 +255,4 @@ All note APIs require JWT token in the `Authorization` header.
 ## 👨‍💻 Author
 
 **Sivasaran R.**  
-GitHub: [Sivasaran2003](https://github.com/Sivasaran2003)
+Gmail: sivasarancbe.2003@gmail.com
